@@ -1,0 +1,81 @@
+
+pipeline {
+    agent any
+    environment {
+            registryUrl= "192.168.3.216"
+            registry_user= "admin"
+            registry_pass= "Harbor12345"
+            /*registryUrl= "image.jayud.com"
+            registry_user= "admin"
+            registry_pass= "ctf12345"*/
+            Project_name= "jayud-file"
+            version= "1.0"
+        }
+
+    tools {
+        maven 'maven'
+    }
+    stages {
+        stage('Print Message') {      //打印信息
+            steps {
+                echo '打印信息'
+                echo "Project_Pipeline_name: ${JOB_NAME}"
+                echo "workspace: ${WORKSPACE}"
+                echo "branch: ${Branch_name}"
+                echo "build_id: ${BUILD_ID}"
+                echo "registryUrl: ${registryUrl}"
+                echo "image_repository: ${registryUrl}/${Project_name}"
+            }
+        }
+         //此步骤在调试Jenkinsfile时可以注释以便了解目录结构
+        stage("maven 编译") {
+            steps {
+                echo 'Building..'
+                sh "mvn clean package -pl jayud-file -am -Dmaven.test.skip=true"
+            }
+        }
+
+        stage('Build & Push Image to Harbor') {      //构建，推送镜像
+            steps {
+                echo '构建，推送镜像到docker镜像仓库'
+                dir ('./jayud-file') {       //指定工作目录（默认为${WORKSPACE}）
+                    script {
+                       echo 'docker login'
+                       sh 'docker login  --username=${registry_user} --password=${registry_pass}   ${registryUrl}'
+                       echo 'app.jar'
+                       sh 'cp ./target/jayud-file-1.0.jar ./app.jar '
+                       echo 'jenkins'
+                       echo "${registryUrl}/jayud-file/${Project_name}:${version}"
+                       docker.build("${registryUrl}/jayud-file/${Project_name}:${version}")
+                       sh "docker push ${registryUrl}/jayud-file/jayud-file:${version}"
+                       if ( Branch_name == 'jenkins' ) {
+                            echo "${registryUrl}/jayud-file/${Project_name}:${version}"
+                            docker.build("${registryUrl}/jayud-file/${Project_name}:${version}")
+                            sh "docker push ${registryUrl}/jayud-file/jayud-file:${version}"
+                       }
+                    }
+                }
+            }
+        }
+
+        stage ('SSH Server') {
+                            steps{
+                                script {
+                                    def remote = [:]
+                                    remote.name = 'auth'
+                                    remote.host = '192.168.3.213'
+                                    remote.port = 22
+                                    remote.allowAnyHosts = true
+                                    remote.user = 'root'
+                                    remote.password = 'Admin!1'
+                                    stage ('remote'){
+                                      sshCommand remote: remote,command: "./run.sh file"
+                                    }
+                                }
+                            }
+                        }
+
+
+    }
+
+}

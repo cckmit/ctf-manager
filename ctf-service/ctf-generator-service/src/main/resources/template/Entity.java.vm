@@ -1,0 +1,45 @@
+package ${packageName}.entity;
+
+import javax.validation.constraints.NotNull;
+
+import TimeEntity;
+import UpdateValidator;
+
+/**
+ * 实体类
+ */
+public class ${entityName} extends TimeEntity implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	@NotNull(groups = { UpdateValidator.class })
+	private Long id;// ID
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		${entityName} item = (${entityName}) o;
+		return Objects.equal(id, item.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(id);
+	}
+
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(this).add("id", id).add("createTime", super.getCreateTime()).toString();
+	}
+
+}

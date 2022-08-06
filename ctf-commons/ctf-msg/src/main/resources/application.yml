@@ -1,0 +1,33 @@
+server:
+  port: 8001 #端口
+spring:
+  kafka:     # 指定kafka 代理地址，可以多个
+    bootstrap-servers: ${kafka.producer.servers}
+  redis:
+    host: ${redis.server.url}
+    port: ${redis.server.port}
+    password: ${redis.server.password}
+    timeout: 2000s
+  main:
+    allow-bean-definition-overriding: true
+  cloud:
+    config:
+      allow-override: true
+
+hystrix:
+  command:
+    default:
+      execution:
+        timeout:
+          enabled: true
+        isolation:
+          thread:
+            timeoutInMilliseconds: 30000
+feign:
+  httpclient:
+    connection-timeout: 5000
+ribbon:
+  ReadTimeout: 30000
+  ConnectTimeout: 30000
+
+

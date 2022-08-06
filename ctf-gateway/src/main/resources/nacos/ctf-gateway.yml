@@ -1,0 +1,51 @@
+server:
+  port: 10003
+
+spring:
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"   # 允许跨域请求的域名或服务器IP,多个用逗号分隔，*为允许所有
+            allowedMethods: # 允许跨域的请求方法
+              - GET
+              - POST
+              - PUT
+              - DELETE
+      default-filters:
+        - StripPrefix=1
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+      - id: ctf-auth
+        uri: lb://ctf-auth
+        predicates:
+        - Path=/api/uaa/**
+        
+      - id: ctf-account-service
+        uri: lb://ctf-account-service
+        predicates:
+        - Path=/api/account/**
+        
+      - id: ctf-admin-service
+        uri: lb://ctf-admin-service
+        predicates:
+        - Path=/api/admin/**
+        
+      - id: ctf-file-service
+        uri: lb://ctf-file-service
+        predicates:
+        - Path=/api/file/**
+
+      - id: ctf-generator-service
+        uri: lb://ctf-generator-service
+        predicates:
+        - Path=/api/generator/**
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB

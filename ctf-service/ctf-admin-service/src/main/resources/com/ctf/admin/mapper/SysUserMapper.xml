@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ctf.admin.mapper.SysUserMapper">
+
+    <select id="querySysUser" parameterType="map" resultType="java.util.LinkedHashMap">
+        SELECT CAST(msu.id AS CHAR) AS "id",msu.username AS "username",msu.nickname AS "nickname",msu.email AS "email",msu.mobile AS "mobile",msu.prefix AS "prefix",GROUP_CONCAT(msru.role_id) AS "roleId",GROUP_CONCAT(msr.role_name) AS "roleIdCn",CAST(msu.org_id AS CHAR) AS "orgId",mso.org_name AS "orgIdCn",msu.status AS "status",msu.create_time AS "createTime"
+        FROM mscode_sys_user msu LEFT JOIN mscode_sys_role_user msru ON msu.id = msru.user_id LEFT JOIN mscode_sys_role msr ON msr.id = msru.role_id LEFT JOIN mscode_sys_org mso ON msu.org_id = mso.id
+  	    WHERE 1 = 1
+      	<if test="username != null and username != ''">
+    		AND msu.username LIKE CONCAT('%',#{username},'%')
+    	</if>
+    	<if test="statusList != null">
+    		AND msu.status IN
+            <foreach item="item" index="index" collection="statusList" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+    	</if>
+        <if test="tenantCode != null and tenantCode != ''">
+            AND msu.tenant_code = #{tenantCode}
+        </if>
+        <if test="orgId != null">
+            AND msu.org_id = #{orgId}
+        </if>
+        GROUP BY msu.id
+        <if test="sort != null and sequence != null">
+            ORDER BY ${sort} ${sequence}
+        </if>
+    </select>
+
+    <select id="queryUsername" resultType="java.util.LinkedHashMap">
+        SELECT username AS "value"
+        FROM mscode_sys_user
+        WHERE status = 1
+        <if test="array != null and array.length > 0">
+            AND id IN
+            <foreach item="id" collection="array" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </if>
+    </select>
+    
+    <select id="querySysUserId" resultType="Long">
+        SELECT CAST(id AS CHAR) AS "id"
+        FROM mscode_sys_user
+        WHERE status = 1
+        <if test="array != null and array.length > 0">
+            AND username IN
+            <foreach item="username" collection="array" open="(" separator="," close=")">
+                #{username}
+            </foreach>
+        </if>
+    </select>
+  
+    <select id="getSysUserByIdentification" resultType="Integer">
+        SELECT DISTINCT 1
+        FROM mscode_sys_user
+        WHERE username = #{username,jdbcType=VARCHAR} OR email = #{email,jdbcType=VARCHAR} OR mobile = #{mobile,jdbcType=VARCHAR}
+    </select>
+    
+    <select id="getSysUserByIdEmailMobile" resultType="Integer">
+        SELECT DISTINCT 1
+        FROM mscode_sys_user
+        WHERE id != #{id,jdbcType=BIGINT} AND (email = #{email,jdbcType=VARCHAR} OR mobile = #{mobile,jdbcType=VARCHAR})
+    </select>
+
+    <select id="queryUserIdByOrgId" resultType="Long">
+        SELECT msu.id
+        FROM mscode_sys_user msu
+        WHERE msu.org_id = #{orgId,jdbcType=BIGINT}
+        <if test="assign == 0">
+            AND NOT EXISTS (SELECT 1 FROM mscode_sys_role_user msru WHERE msu.id = msru.user_id AND msru.role_id = #{roleId,jdbcType=BIGINT})
+        </if>
+        <if test="assign == 1">
+            AND EXISTS (SELECT 1 FROM mscode_sys_role_user msru WHERE msu.id = msru.user_id AND msru.role_id = #{roleId,jdbcType=BIGINT})
+        </if>
+    </select>
+
+    <select id="queryUsernameNickname" resultType="java.util.LinkedHashMap">
+		SELECT CONCAT_WS("-",username,nickname) AS "label",id AS "value"
+		FROM mscode_sys_user
+    </select>
+
+    <insert id="insertSysUser" parameterType="SysUser">
+        INSERT INTO mscode_sys_user
+            (id, username, nickname, password, email, mobile, prefix, org_id, province_regioncode, city_regioncode, avatar, status, tenant_code)
+        VALUES
+            (#{id,jdbcType=BIGINT}, #{username,jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{mobile,jdbcType=VARCHAR}, #{prefix,jdbcType=VARCHAR}, #{orgId,jdbcType=BIGINT}, '440000', '440100', '/api/file/static/upload/20200224110421638.png', #{status,jdbcType=SMALLINT}, #{tenantCode,jdbcType=VARCHAR})
+    </insert>
+
+    <update id="updateSysUser" parameterType="SysUser">
+        UPDATE mscode_sys_user
+        <set>
+            <if test="password != null and password != ''">password=#{password},</if>
+            <if test="email != null and email != ''">email=#{email},</if>
+            <if test="mobile != null and mobile != ''">mobile=#{mobile},</if>
+            <if test="orgId != null">org_id=#{orgId},</if>
+            <if test="status != null">status=#{status},</if>
+            prefix=#{prefix,jdbcType=VARCHAR}
+        </set>
+        WHERE id=#{id,jdbcType=BIGINT}
+    </update>
+    
+    <delete id="deleteSysUser">
+		DELETE FROM mscode_sys_user WHERE id IN
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id,jdbcType=BIGINT}
+		</foreach>
+	</delete>
+
+</mapper>

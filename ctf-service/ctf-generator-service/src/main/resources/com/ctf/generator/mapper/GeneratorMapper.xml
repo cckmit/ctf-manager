@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ctf.generator.mapper.GeneratorMapper">
+
+    <sql id="queryConditions">
+        SELECT CAST(id AS CHAR) AS "id",module_name AS "moduleName",service_name AS "serviceName",package_name AS "packageName",entity_name AS "entityName",table_name AS "tableName",id_name AS "idName",create_time AS "createTime"
+        FROM mscode_generator
+    </sql>
+
+    <select id="queryGenerator" parameterType="map" resultType="java.util.LinkedHashMap">
+        <include refid="queryConditions"></include>
+  	    WHERE 1 = 1
+      	<if test="moduleName != null and moduleName != ''">
+    		AND module_name LIKE CONCAT('%',#{moduleName},'%')
+    	</if>
+        <if test="serviceName != null and serviceName != ''">
+            AND service_name LIKE CONCAT('%',#{serviceName},'%')
+        </if>
+        <if test="tenantCode != null and tenantCode != ''">
+            AND tenant_code = #{tenantCode}
+        </if>
+        <if test="sort != null and sequence != null">
+            ORDER BY ${sort} ${sequence}
+        </if>
+    </select>
+
+    <select id="queryGeneratorById" resultType="java.util.LinkedHashMap">
+        <include refid="queryConditions"></include>
+        WHERE id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id,jdbcType=BIGINT}
+        </foreach>
+    </select>
+
+    <select id="queryFieldByGeneratorId" resultType="java.util.LinkedHashMap">
+        SELECT id AS "id",field_type AS "fieldType",field AS "field"
+        FROM mscode_generator_field
+        WHERE generator_id = #{generatorId,jdbcType=BIGINT}
+    </select>
+
+    <insert id="insertGenerator" parameterType="Generator">
+        INSERT INTO mscode_generator
+            (id, module_name, service_name, package_name, entity_name, table_name, id_name, tenant_code)
+        VALUES
+            (#{id,jdbcType=BIGINT}, #{moduleName,jdbcType=VARCHAR}, #{serviceName,jdbcType=VARCHAR}, #{packageName,jdbcType=VARCHAR}, #{entityName,jdbcType=VARCHAR}, #{tableName,jdbcType=VARCHAR}, #{idName,jdbcType=VARCHAR}, #{tenantCode,jdbcType=VARCHAR})
+    </insert>
+
+    <insert id="insertGeneratorField">
+        INSERT INTO mscode_generator_field
+            (id, field_type, field, generator_id)
+        VALUES
+            (#{id,jdbcType=BIGINT}, #{fieldType,jdbcType=VARCHAR}, #{field,jdbcType=VARCHAR}, #{generatorId,jdbcType=BIGINT})
+    </insert>
+
+    <update id="updateGenerator" parameterType="Generator">
+        UPDATE mscode_generator
+        <set>
+            <if test="moduleName != null and moduleName != ''">module_name=#{moduleName},</if>
+            <if test="serviceName != null and serviceName != ''">service_name=#{serviceName},</if>
+            <if test="packageName != null and packageName != ''">package_name=#{packageName},</if>
+            <if test="entityName != null and entityName != ''">entity_name=#{entityName},</if>
+			<if test="tableName != null and tableName != ''">table_name=#{tableName},</if>
+            <if test="idName != null and idName != ''">id_name=#{idName},</if>
+        </set>
+        WHERE id=#{id,jdbcType=BIGINT}
+    </update>
+
+    <delete id="deleteGenerator">
+		DELETE FROM mscode_generator WHERE id IN
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id,jdbcType=BIGINT}
+		</foreach>
+	</delete>
+
+    <delete id="deleteGeneratorField">
+        DELETE FROM mscode_generator_field WHERE generator_id IN
+		<foreach item="generatorId" collection="array" open="(" separator="," close=")">
+			#{generatorId,jdbcType=BIGINT}
+		</foreach>
+    </delete>
+
+</mapper>

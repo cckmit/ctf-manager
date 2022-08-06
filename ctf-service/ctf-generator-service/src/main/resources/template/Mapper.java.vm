@@ -1,0 +1,46 @@
+package ${packageName}.mapper;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import ${packageName}.entity.${entityName};
+
+/**
+ * 数据持久接口层
+ */
+public interface ${entityName}Mapper {
+
+	/**
+	 * 查询分页或导出数据
+	 * 
+	 * @param paramMap 参数Map
+	 * @return
+	 */
+	List<LinkedHashMap<String, Object>> query${entityName}(Map<String, Object> paramMap);
+
+	/**
+	 * 新增
+	 * 
+	 * @param ${lowercaseFirstOneEntityName}
+	 * @return
+	 */
+	int insert${entityName}(${entityName} ${lowercaseFirstOneEntityName});
+
+	/**
+	 * 编辑
+	 * 
+	 * @param ${lowercaseFirstOneEntityName}
+	 * @return
+	 */
+	int update${entityName}(${entityName} ${lowercaseFirstOneEntityName});
+
+	/**
+	 * 删除
+	 * 
+	 * @param id ID
+	 * @return
+	 */
+	int delete${entityName}(Long[] id);
+
+}

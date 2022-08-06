@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ctf.admin.mapper.SysRoleMapper">
+
+    <select id="querySysRole" parameterType="map" resultType="java.util.LinkedHashMap">
+        SELECT CAST(id AS CHAR) AS "id",role_code AS "roleCode",role_name AS "roleName",role_description AS "roleDescription",create_time AS "createTime"
+        FROM mscode_sys_role
+  	    WHERE 1 = 1
+      	<if test="roleName != null and roleName != ''">
+    		AND role_name LIKE CONCAT('%',#{roleName},'%')
+    	</if>
+        <if test="tenantCode != null and tenantCode != ''">
+            AND tenant_code = #{tenantCode}
+        </if>
+        <if test="sort != null and sequence != null">
+            ORDER BY ${sort} ${sequence}
+        </if>
+    </select>
+
+    <select id="queryRoleName" resultType="java.util.LinkedHashMap">
+        SELECT msr.role_name AS "name",CAST(msr.id AS CHAR) AS "value"
+        FROM mscode_sys_role msr
+        WHERE msr.tenant_code = #{tenantCode,jdbcType=VARCHAR}
+        <if test="assign == 0">
+            AND NOT EXISTS (SELECT 1 FROM mscode_sys_role_user msru WHERE msr.id = msru.role_id AND msru.user_id = #{userId,jdbcType=BIGINT})
+        </if>
+        <if test="assign == 1">
+            AND EXISTS (SELECT 1 FROM mscode_sys_role_user msru WHERE msr.id = msru.role_id AND msru.user_id = #{userId,jdbcType=BIGINT})
+        </if>
+    </select>
+
+    <select id="queryRoleCode" resultType="java.util.LinkedHashMap">
+        SELECT role_code AS "name",role_code AS "value"
+        FROM mscode_sys_role
+    </select>
+
+    <select id="queryRoleCodeList" resultType="String">
+        SELECT role_code AS "roleCode"
+        FROM mscode_sys_role
+    </select>
+
+    <select id="queryRoleNameCheckbox" resultType="java.util.LinkedHashMap">
+        SELECT CAST(id AS CHAR) AS "value",role_name AS "label"
+        FROM mscode_sys_role
+    </select>
+
+    <select id="getSysRoleByRoleCode" resultType="Integer">
+        SELECT DISTINCT 1
+        FROM mscode_sys_role
+        WHERE role_code = #{roleCode,jdbcType=VARCHAR}
+    </select>
+
+    <select id="queryUserIdByRoleId" parameterType="Long" resultType="Long">
+        SELECT user_id
+        FROM mscode_sys_role_user
+        WHERE role_id = #{roleId,jdbcType=BIGINT}
+    </select>
+
+    <select id="queryRoleIdByUserId" parameterType="Long" resultType="Long">
+        SELECT role_id
+        FROM mscode_sys_role_user
+        WHERE user_id = #{userId,jdbcType=BIGINT}
+    </select>
+
+    <select id="queryRoleData" resultType="String">
+        SELECT mrd.data_field AS "dataField"
+        FROM mscode_sys_role_data mrd
+        WHERE mrd.menu_code = #{menuCode,jdbcType=VARCHAR} AND EXISTS (SELECT 1 FROM mscode_sys_role msr,mscode_sys_role_user msru,mscode_sys_user msu WHERE msr.id = msru.role_id AND msu.id = msru.user_id AND msr.role_code = mrd.role_code AND msu.username = #{username,jdbcType=VARCHAR})
+    </select>
+
+    <insert id="insertSysRole" parameterType="SysRole">
+        INSERT INTO mscode_sys_role
+            (id, role_code, role_name, role_description, tenant_code)
+        VALUES
+            (#{id,jdbcType=BIGINT}, #{roleCode,jdbcType=VARCHAR}, #{roleName,jdbcType=VARCHAR}, #{roleDescription,jdbcType=VARCHAR}, #{tenantCode,jdbcType=VARCHAR})
+    </insert>
+
+    <insert id="insertSysRoleUser">
+        INSERT INTO mscode_sys_role_user
+            (id, role_id, user_id)
+        VALUES
+            (#{id,jdbcType=BIGINT}, #{roleId,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT})
+    </insert>
+
+    <update id="updateSysRole" parameterType="SysRole">
+        UPDATE mscode_sys_role
+        <set>
+            <if test="roleName != null and roleName != ''">role_name=#{roleName},</if>
+            role_description=#{roleDescription,jdbcType=VARCHAR}
+        </set>
+        WHERE id=#{id,jdbcType=BIGINT}
+    </update>
+    
+    <delete id="deleteSysRole">
+        DELETE mscode_sys_role,mscode_sys_role_menu,mscode_sys_role_menubutton
+        FROM mscode_sys_role LEFT JOIN mscode_sys_role_menu ON mscode_sys_role.id = mscode_sys_role_menu.role_id LEFT JOIN mscode_sys_role_menubutton ON mscode_sys_role.role_code = mscode_sys_role_menubutton.role_code 
+        WHERE mscode_sys_role.id IN
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id,jdbcType=BIGINT}
+		</foreach>
+	</delete>
+
+    <delete id="deleteSysRoleUser">
+        DELETE FROM mscode_sys_role_user WHERE user_id = #{userId,jdbcType=BIGINT} OR role_id = #{roleId,jdbcType=BIGINT}
+    </delete>
+
+</mapper>

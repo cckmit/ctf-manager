@@ -1,0 +1,92 @@
+package ${packageName}.service.impl;
+
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import ${packageName}.entity.${entityName};
+import ${packageName}.mapper.${entityName}Mapper;
+import ${packageName}.service.${entityName}Service;
+import PaginationBuilder;
+import SequenceGenerator;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+
+/**
+ * 业务逻辑实现层
+ */
+@Service
+@Transactional
+public class ${entityName}ServiceImpl implements ${entityName}Service {
+
+	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private static SequenceGenerator sequenceGenerator = new SequenceGenerator();
+
+	@Autowired
+	private ${entityName}Mapper ${lowercaseFirstOneEntityName}Mapper;
+
+	/**
+	 * 查询分页
+	 */
+	@Override
+	public Map<String, Object> query${entityName}(Integer currentPage, Integer pageSize, String name, String sorter) {
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("name", name);
+		if (StringUtils.isNotBlank(sorter)) {
+			String sort = sorter.substring(0, sorter.lastIndexOf('_'));
+			String sequence = "ascend".equals(sorter.substring(sorter.lastIndexOf('_') + 1)) ? "ASC" : "DESC";
+			paramMap.put("sort", sort);
+			paramMap.put("sequence", sequence);
+		} else {
+			paramMap.put("sort", "createTime");
+			paramMap.put("sequence", "DESC");
+		}
+		Page<Object> page = PageHelper.startPage(currentPage, pageSize);
+		List<LinkedHashMap<String, Object>> resultList = ${lowercaseFirstOneEntityName}Mapper.query${entityName}(paramMap);
+		return PaginationBuilder.buildResult(resultList, page.getTotal(), currentPage, pageSize);
+	}
+
+	/**
+	 * 查询导出数据列表
+	 */
+	@Override
+	public List<LinkedHashMap<String, Object>> query${entityName}ForExcel(Map<String, Object> paramMap) {
+		return ${lowercaseFirstOneEntityName}Mapper.query${entityName}(paramMap);
+	}
+
+	/**
+	 * 新增
+	 */
+	@Override
+	public void insert${entityName}(${entityName} ${lowercaseFirstOneEntityName}) {
+		${lowercaseFirstOneEntityName}.setId(sequenceGenerator.nextId());
+		${lowercaseFirstOneEntityName}Mapper.insert${entityName}(${lowercaseFirstOneEntityName});
+		logger.info("已新增： {}", ${lowercaseFirstOneEntityName}.getId());
+	}
+
+	/**
+	 * 编辑
+	 */
+	@Override
+	public void update${entityName}(${entityName} ${lowercaseFirstOneEntityName}) {
+		${lowercaseFirstOneEntityName}Mapper.update${entityName}(${lowercaseFirstOneEntityName});
+		logger.info("已编辑： {}", ${lowercaseFirstOneEntityName}.getId());
+	}
+
+	/**
+	 * 删除
+	 */
+	@Override
+	public void delete${entityName}(Long[] id) {
+		${lowercaseFirstOneEntityName}Mapper.delete${entityName}(id);
+	}
+
+}

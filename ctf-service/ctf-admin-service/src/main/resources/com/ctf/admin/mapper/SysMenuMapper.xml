@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ctf.admin.mapper.SysMenuMapper">
+
+    <sql id="queryConditions">
+        <if test="menuName != null and menuName != ''">
+            AND msm.menu_name LIKE CONCAT('%',#{menuName},'%')
+        </if>
+        <if test="menuPath != null and menuPath != ''">
+            AND msm.menu_path LIKE CONCAT('%',#{menuPath},'%')
+        </if>
+        <if test="tenantCode != null and tenantCode != ''">
+            AND msm.tenant_code = #{tenantCode}
+        </if>
+    </sql>
+
+    <select id="querySysMenu" parameterType="map" resultType="java.util.LinkedHashMap">
+        SELECT CAST(msm.id AS CHAR) AS "id",msm.menu_code AS "menuCode",msm.menu_name AS "menuName",msm.menu_icon AS "menuIcon",msm.menu_path AS "menuPath",msm.menu_component AS "menuComponent",msm.menu_sequence AS "menuSequence",msm.menu_status AS "menuStatus",(CASE WHEN msm.menu_status = 0 THEN '隐藏' ELSE '显示' END) AS "menuStatusCn",CAST(msm.parent_id AS CHAR) AS "parentId",msm.create_time AS "createTime"
+        FROM mscode_sys_menu msm
+  	    WHERE 1 = 1
+        <include refid="queryConditions"></include>
+        <if test="parentId != null">
+            AND msm.parent_id = #{parentId}
+        </if>
+        ORDER BY menu_sequence ASC
+    </select>
+
+    <select id="querySysMenuTree" resultType="java.util.LinkedHashMap">
+        SELECT menu_code AS "menuCode",CAST(id AS CHAR) AS "id",CAST(id AS CHAR) AS "key",menu_name AS "title",CAST(id AS CHAR) AS "value",CAST(parent_id AS CHAR) AS "parentId"
+        FROM mscode_sys_menu
+        WHERE tenant_code = #{tenantCode,jdbcType=VARCHAR}
+        ORDER BY menu_sequence ASC
+    </select>
+
+    <select id="queryMenuCode" resultType="String">
+        SELECT DISTINCT menu_code AS "menuCode"
+        FROM mscode_sys_menu_button
+    </select>
+
+    <select id="queryMenuButton" resultType="String">
+        SELECT menu_button AS "menuButton" 
+        FROM mscode_sys_menu_button 
+        WHERE menu_code = #{menuCode,jdbcType=VARCHAR}
+    </select>
+
+    <select id="queryMenuIdByRoleId" resultType="String">
+        SELECT CAST(menu_id AS CHAR) AS "menuId"
+        FROM mscode_sys_role_menu
+        WHERE role_id = #{roleId,jdbcType=BIGINT} AND menu_id NOT IN (SELECT parent_id FROM mscode_sys_menu)
+    </select>
+
+    <select id="queryMenuButtonByRoleCode" resultType="String">
+        SELECT menu_button AS "menuButton"
+        FROM mscode_sys_role_menubutton
+        WHERE role_code = #{roleCode,jdbcType=VARCHAR}
+    </select>
+
+    <select id="queryDataFieldByMenuCode" parameterType="map" resultType="java.util.LinkedHashMap">
+        SELECT CAST(id AS CHAR) AS "key",role_code AS "roleCode",data_field AS "dataField"
+        FROM mscode_sys_role_data
+        WHERE menu_code = #{menuCode,jdbcType=VARCHAR}
+    </select>
+
+    <select id="queryParentIdById" resultType="Long">
+        SELECT parent_id AS "parentId"
+        FROM mscode_sys_menu
+        WHERE id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id,jdbcType=BIGINT}
+        </foreach>
+    </select>
+
+    <select id="queryCheckedMenuButton" resultType="String">
+        SELECT menu_button AS "menuButton"
+        FROM mscode_sys_menu_button
+        WHERE menu_code = #{menuCode,jdbcType=VARCHAR}
+    </select>
+
+    <select id="getSysMenuByMenuCode" resultType="Integer">
+        SELECT DISTINCT 1
+        FROM mscode_sys_menu
+        WHERE menu_code = #{menuCode,jdbcType=VARCHAR}
+    </select>
+    
+    <select id="getSysMenuByIdMenuPath" resultType="Integer">
+        SELECT DISTINCT 1
+        FROM mscode_sys_menu
+        WHERE menu_path = #{menuPath,jdbcType=VARCHAR}
+        <if test="id != null">
+            AND id != #{id}
+        </if>
+    </select>    
+    
+    <insert id="insertSysMenu" parameterType="SysMenu">
+        INSERT INTO mscode_sys_menu
+            (id, menu_code, menu_name, menu_icon, menu_path, menu_component, menu_sequence, menu_status, parent_id, tenant_code)
+        VALUES
+            (#{id,jdbcType=BIGINT}, #{menuCode,jdbcType=VARCHAR}, #{menuName,jdbcType=VARCHAR}, #{menuIcon,jdbcType=VARCHAR}, #{menuPath,jdbcType=VARCHAR}, #{menuComponent,jdbcType=VARCHAR}, #{menuSequence,jdbcType=BIGINT}, #{menuStatus,jdbcType=SMALLINT}, #{parentId,jdbcType=BIGINT}, #{tenantCode,jdbcType=VARCHAR})
+    </insert>
+
+    <insert id="insertRoleIdMenuId">
+        INSERT INTO mscode_sys_role_menu
+            (id, role_id, menu_id)
+        VALUES
+            (#{id,jdbcType=BIGINT}, #{roleId,jdbcType=BIGINT}, #{menuId,jdbcType=BIGINT})
+    </insert>
+
+    <insert id="insertRoleCodeMenuButton">
+        INSERT INTO mscode_sys_role_menubutton
+            (id, role_code, menu_button)
+        VALUES
+            (#{id,jdbcType=BIGINT}, #{roleCode,jdbcType=VARCHAR}, #{menuButton,jdbcType=VARCHAR})
+    </insert>
+
+    <insert id="insertMenuButton">
+        INSERT INTO mscode_sys_menu_button
+            (id, menu_code, menu_button)
+        VALUES
+            (#{id,jdbcType=BIGINT}, #{menuCode,jdbcType=VARCHAR}, #{menuButton,jdbcType=VARCHAR})
+    </insert>
+
+    <insert id="insertRoleCodeMenuData">
+        INSERT INTO mscode_sys_role_data
+            (id, role_code, menu_code, data_field)
+        VALUES
+            (#{id,jdbcType=BIGINT}, #{roleCode,jdbcType=VARCHAR}, #{menuCode,jdbcType=VARCHAR}, #{dataField,jdbcType=VARCHAR})
+    </insert>
+
+    <update id="updateSysMenu" parameterType="SysMenu">
+        UPDATE mscode_sys_menu
+        <set>
+            <if test="menuName != null and menuName != ''">menu_name=#{menuName},</if>
+            <if test="menuStatus != null">menu_status=#{menuStatus},</if>
+            <if test="parentId != null">parent_id=#{parentId},</if>
+            menu_icon=#{menuIcon,jdbcType=VARCHAR},
+            menu_path=#{menuPath,jdbcType=VARCHAR},
+            menu_component=#{menuComponent,jdbcType=VARCHAR},
+            menu_sequence=#{menuSequence,jdbcType=BIGINT}
+        </set>
+        WHERE id=#{id,jdbcType=BIGINT}
+    </update>
+
+    <delete id="deleteSysMenu">
+		DELETE mscode_sys_menu,mscode_sys_menu_button
+        FROM mscode_sys_menu LEFT JOIN mscode_sys_menu_button ON mscode_sys_menu.menu_code = mscode_sys_menu_button.menu_code
+        WHERE mscode_sys_menu.id IN
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id,jdbcType=BIGINT}
+		</foreach>
+	</delete>
+
+    <delete id="deleteRoleMenu">
+        DELETE FROM mscode_sys_role_menu WHERE role_id = #{roleId,jdbcType=BIGINT}
+    </delete>
+
+    <delete id="deleteRoleMenuButton">
+        DELETE FROM mscode_sys_role_menubutton WHERE role_code = #{roleCode,jdbcType=VARCHAR}
+    </delete>
+
+    <delete id="deleteButtonByMenuCode">
+        DELETE FROM mscode_sys_menu_button WHERE menu_code = #{menuCode,jdbcType=VARCHAR}
+    </delete>
+
+    <delete id="deleteRoleMenuData">
+        DELETE FROM mscode_sys_role_data WHERE role_code = #{roleCode,jdbcType=VARCHAR} AND menu_code = #{menuCode,jdbcType=VARCHAR}
+    </delete>
+
+</mapper>

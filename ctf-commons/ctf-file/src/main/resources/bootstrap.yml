@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: jayud-file-web
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      config:
+        server-addr: ${ctf.nacos.server-addr}
+        # 配置文件后缀名为yaml
+        file-extension: yaml
+        namespace: ${ctf.nacos.config.namespace}
+      discovery:
+        server-addr: ${ctf.nacos.server-addr}
+        namespace: ${ctf.nacos.config.namespace}
+#允许上传的文件
+file:
+  allow-image-types:
+    - image/jpeg
+    - image/png
+    - image/jpeg
+    - image/gif
+  allow-file-types:
+    - application/pdf
+    - application/vnd.ms-excel
+    #word
+    - application/vnd.openxmlformats-officedocument.wordprocessingml.document
+    #压缩包
+    - application/octet-stream
+  #base-url: http://test.oms.jayud.com:9448
+  base-url: http://192.168.3.212:8888

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ctf.admin.mapper.SysRegionMapper">
+
+    <sql id="queryConditions">
+        <if test="regionName != null and regionName != ''">
+            AND region_name LIKE CONCAT('%',#{regionName},'%')
+        </if>
+        <if test="regionCode != null and regionCode != ''">
+            AND region_code LIKE CONCAT('%',#{regionCode},'%')
+        </if>
+        <if test="regionType != null and regionType != ''">
+            AND region_type = #{regionType}
+        </if>
+        <if test="tenantCode != null and tenantCode != ''">
+            AND msr.tenant_code = #{tenantCode}
+        </if>
+    </sql>
+
+    <select id="querySysRegion" parameterType="map" resultType="java.util.LinkedHashMap">
+        SELECT msr.region_code AS "id",msr.region_name AS "regionName",msr.region_code AS "regionCode",msr.region_type AS "regionType",msd.dict_name AS "regionTypeCn",msr.parent_region_code AS "parentRegionCode",msr.parent_region_code AS "parentId",msr.create_time AS "createTime"
+        FROM mscode_sys_region msr LEFT JOIN mscode_sys_dict msd ON msr.region_type = msd.dict_value AND msd.dict_type = 'region'
+        WHERE 1 = 1
+        <include refid="queryConditions"></include>
+        <if test="parentRegionCode != null and parentRegionCode != ''">
+            AND parent_region_code = #{parentRegionCode}
+        </if>
+    </select>
+
+    <select id="querySysRegionTree" resultType="java.util.LinkedHashMap">
+        SELECT region_code AS "id",region_code AS "key",region_name AS "title",region_code AS "value",parent_region_code AS "parentRegionCode",parent_region_code AS "parentId"
+        FROM mscode_sys_region
+        WHERE tenant_code = #{tenantCode,jdbcType=VARCHAR}
+    </select>
+
+    <select id="queryProvince" resultType="java.util.LinkedHashMap">
+        SELECT region_name AS "name",region_code AS "id"
+        FROM mscode_sys_region
+        WHERE region_type = 'province'
+    </select>
+    
+    <select id="queryCity" resultType="java.util.LinkedHashMap">
+        SELECT region_name AS "name",region_code AS "id"
+        FROM mscode_sys_region
+        WHERE parent_region_code = #{province,jdbcType=VARCHAR}
+    </select>
+    
+    <select id="getSysRegionByRegionCode" resultType="Integer">
+        SELECT DISTINCT 1
+        FROM mscode_sys_region
+        WHERE region_code = #{regionCode,jdbcType=VARCHAR}
+    </select>
+    
+    <insert id="insertSysRegion" parameterType="SysRegion">
+        INSERT INTO mscode_sys_region
+            (id, region_name, region_code, region_type, parent_region_code, tenant_code)
+        VALUES
+            (#{id,jdbcType=BIGINT}, #{regionName,jdbcType=VARCHAR}, #{regionCode,jdbcType=VARCHAR}, #{regionType,jdbcType=VARCHAR}, #{parentRegionCode,jdbcType=VARCHAR}, #{tenantCode,jdbcType=VARCHAR})
+    </insert>
+
+    <update id="updateSysRegion" parameterType="SysRegion">
+        UPDATE mscode_sys_region
+        <set>
+            <if test="regionName != null and regionName != ''">region_name=#{regionName},</if>
+            <if test="regionType != null and regionType != ''">region_type=#{regionType},</if>
+            <if test="parentRegionCode != null and parentRegionCode != ''">parent_region_code=#{parentRegionCode},</if>
+        </set>
+        WHERE region_code=#{regionCode,jdbcType=VARCHAR}
+    </update>
+    
+    <delete id="deleteSysRegion">
+        DELETE FROM mscode_sys_region WHERE region_code IN
+        <foreach item="regionCode" collection="array" open="(" separator="," close=")">
+            #{regionCode,jdbcType=VARCHAR}
+        </foreach>
+    </delete>
+
+</mapper>

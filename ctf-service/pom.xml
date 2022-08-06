@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>ctf-platform</artifactId>
+        <groupId>com.ctf</groupId>
+        <version>1.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>ctf-service</artifactId>
+    <packaging>pom</packaging>
+    <modules>
+        <module>ctf-account-service</module>
+        <module>ctf-admin-service</module>
+        <module>ctf-generator-service</module>
+        <module>ctf-bi-service</module>
+        <module>ctf-base-service</module>
+        <module>ctf-app-service</module>
+        <module>ctf-convert-service</module>
+        <module>ctf-external-service</module>
+        <module>ctf-welfare-service</module>
+    </modules>
+
+</project>

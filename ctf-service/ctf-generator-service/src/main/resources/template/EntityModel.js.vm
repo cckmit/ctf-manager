@@ -1,0 +1,69 @@
+/**
+ * 数据请求
+ */
+import { query${entityName}, delete${entityName}, add${entityName}, update${entityName}, export${entityName} } from '@/services/api';
+
+export default {
+  namespace: '${lowercaseFirstOneEntityName}',
+
+  state: {
+    data: {
+      list: [],
+      pagination: {}
+    }
+  },
+
+  effects: {
+    *fetch({ payload }, { call, put }) {
+      const response = yield call(query${entityName}, payload);
+      yield put({
+        type: 'save',
+        payload: response
+      });
+    },
+    *add({ payload }, { call, put }) {
+      const response = yield call(add${entityName}, payload);
+      yield put({
+        type: 'save',
+        payload: response
+      });
+      if (!response.message) return;
+      return response;
+    },
+    *delete({ payload }, { call, put }) {
+      const response = yield call(delete${entityName}, payload);
+      yield put({
+        type: 'save',
+        payload: response
+      });
+      if (!response.message) return;
+      return response;
+    },
+    *update({ payload }, { call, put }) {
+      const response = yield call(update${entityName}, payload);
+      yield put({
+        type: 'save',
+        payload: response
+      });
+      if (!response.message) return;
+      return response;
+    },
+    *export({ payload }, { call, put }) {
+      const response = yield call(export${entityName}, payload);
+      yield put({
+        type: 'save',
+        payload: response
+      });
+      return response;
+    }
+  },
+
+  reducers: {
+    save(state, action) {
+      return {
+        ...state,
+        data: action.payload.data
+      };
+    }
+  }
+};

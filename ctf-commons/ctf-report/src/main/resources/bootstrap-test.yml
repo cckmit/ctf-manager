@@ -1,0 +1,11 @@
+ctf:
+  nacos:
+    server-addr: 192.168.3.212:8848
+    config:
+      namespace: test
+logging:
+  level:
+    root: info
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

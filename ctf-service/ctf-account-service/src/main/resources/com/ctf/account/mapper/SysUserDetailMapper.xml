@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ctf.account.mapper.SysUserDetailMapper">
+
+    <select id="getSysUserByIdentification" resultType="Integer">
+        SELECT DISTINCT 1
+        FROM mscode_sys_user
+        WHERE username = #{username,jdbcType=VARCHAR} OR email = #{email,jdbcType=VARCHAR} OR mobile = #{mobile,jdbcType=VARCHAR}
+    </select>
+
+    <select id="getSysUserByIdEmailMobile" resultType="Integer">
+        SELECT DISTINCT 1
+        FROM mscode_sys_user
+        WHERE id != #{id,jdbcType=BIGINT} AND (email = #{email,jdbcType=VARCHAR} OR mobile = #{mobile,jdbcType=VARCHAR})
+    </select>
+
+    <select id="getPasswordById" parameterType="long" resultType="String">
+        SELECT password AS "password"
+        FROM mscode_sys_user
+        WHERE id = #{id,jdbcType=BIGINT}
+    </select>
+
+    <select id="getRoleCodeBySysUser" resultType="String">
+        SELECT msr.role_code AS "roleCode"
+        FROM mscode_sys_role msr,mscode_sys_role_user msru,mscode_sys_user msu
+        WHERE msr.id = msru.role_id AND msu.id = msru.user_id AND (msu.username = #{username,jdbcType=VARCHAR} OR msu.mobile = #{mobile,jdbcType=VARCHAR})
+    </select>
+
+    <select id="querySysMenuAuthorityTree" resultType="java.util.LinkedHashMap">
+        SELECT CAST(id AS CHAR) AS "id",menu_path AS "path",menu_component AS "component",menu_code AS "name",menu_icon AS "icon",(CASE WHEN menu_status = 0 THEN 1 ELSE 0 END) AS "hideInMenu",CAST(parent_id AS CHAR) AS "parentId"
+        FROM mscode_sys_menu
+        WHERE id IN (SELECT menu_id FROM mscode_sys_role_menu mrm WHERE EXISTS
+            (SELECT 1 FROM mscode_sys_role msr,mscode_sys_role_user msru,mscode_sys_user msu WHERE msr.id = msru.role_id AND msu.id = msru.user_id AND msr.id = mrm.role_id AND (msu.username = #{username,jdbcType=VARCHAR} OR msu.mobile = #{mobile,jdbcType=VARCHAR})))
+        ORDER BY menu_sequence ASC
+    </select>
+
+    <select id="queryRoleMenuButton" resultType="String">
+        SELECT mrm.menu_button AS "menuButton"
+        FROM mscode_sys_role_menubutton mrm
+        WHERE EXISTS (SELECT 1 FROM mscode_sys_role msr,mscode_sys_role_user msru,mscode_sys_user msu WHERE msr.id = msru.role_id AND msu.id = msru.user_id AND msr.role_code = mrm.role_code AND (msu.username = #{username,jdbcType=VARCHAR} OR msu.mobile = #{mobile,jdbcType=VARCHAR}))
+    </select>
+
+    <insert id="insertSysUser" parameterType="SysUserDetail">
+        INSERT INTO mscode_sys_user
+            (id, username, nickname, password, email, mobile, prefix, org_id, province_regioncode, city_regioncode, status)
+        VALUES
+            (#{id,jdbcType=BIGINT}, #{username,jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{mobile,jdbcType=VARCHAR}, #{prefix,jdbcType=VARCHAR}, #{orgId,jdbcType=BIGINT}, #{provinceRegionCode,jdbcType=VARCHAR}, #{cityRegionCode,jdbcType=VARCHAR}, #{status,jdbcType=SMALLINT})
+    </insert>
+
+    <update id="updateSysUserDetail" parameterType="SysUserDetail">
+        UPDATE mscode_sys_user
+        <set>
+            nickname=#{nickname,jdbcType=VARCHAR},
+            phone=#{phone,jdbcType=VARCHAR},
+            province_regioncode=#{provinceRegionCode,jdbcType=VARCHAR},
+            city_regioncode=#{cityRegionCode,jdbcType=VARCHAR},
+            address=#{address,jdbcType=VARCHAR},
+            profile=#{profile,jdbcType=VARCHAR}
+        </set>
+        WHERE id=#{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="updateSysUserInfo">
+        UPDATE mscode_sys_user
+        <set>
+            <if test="field == 'password'">
+                password=#{fieldValue,jdbcType=VARCHAR}
+            </if>
+            <if test="field == 'mobile'">
+                mobile=#{fieldValue,jdbcType=VARCHAR}
+            </if>
+            <if test="field == 'email'">
+                email=#{fieldValue,jdbcType=VARCHAR}
+            </if>
+            <if test="field == 'notifyMessage'">
+                notify_message=#{fieldValue,jdbcType=TINYINT}
+            </if>
+            <if test="field == 'notifyTodo'">
+                notify_todo=#{fieldValue,jdbcType=TINYINT}
+            </if>
+            <if test="field == 'avatar'">
+                avatar=#{fieldValue,jdbcType=VARCHAR}
+            </if>
+        </set>
+        WHERE id=#{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="updatePasswordByEmail">
+        UPDATE mscode_sys_user
+        <set>
+            password=#{newPassword,jdbcType=VARCHAR}
+        </set>
+        WHERE email=#{email,jdbcType=VARCHAR}
+    </update>
+
+</mapper>

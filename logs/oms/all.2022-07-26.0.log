@@ -1,0 +1,37 @@
+2022-26-07 01:58:50.864 [35m[background-preinit][0;39m [34mINFO [0;39m o.h.validator.internal.util.Version.<clinit> - HV000001: Hibernate Validator 6.1.7.Final
+2022-26-07 01:58:52.818 [35m[main][0;39m [34mINFO [0;39m com.ctf.CtfEmailApplication.logStartupProfileInfo - The following profiles are active: dev
+2022-26-07 01:58:54.808 [35m[main][0;39m [31mWARN [0;39m o.m.s.mapper.ClassPathMapperScanner.warn - No MyBatis mapper was found in '[com.ctf.*.mapper]' package. Please check your configuration.
+2022-26-07 01:58:54.958 [35m[main][0;39m [34mINFO [0;39m o.s.cloud.context.scope.GenericScope.setSerializationId - BeanFactory id=0364a96d-8294-35ff-a4c2-b23466722095
+2022-26-07 01:58:55.096 [35m[main][0;39m [34mINFO [0;39m o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker.postProcessAfterInitialization - Bean 'dataSourceConfig' of type [com.ctf.component.commons.config.DataSourceConfig$$EnhancerBySpringCGLIB$$d44e73a5] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2022-26-07 01:58:55.159 [35m[main][0;39m [34mINFO [0;39m o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker.postProcessAfterInitialization - Bean 'dataSource' of type [com.alibaba.druid.pool.DruidDataSource] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2022-26-07 01:58:55.165 [35m[main][0;39m [34mINFO [0;39m o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker.postProcessAfterInitialization - Bean 'txManager' of type [org.springframework.jdbc.datasource.DataSourceTransactionManager] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2022-26-07 01:58:55.228 [35m[main][0;39m [1;31mERROR[0;39m o.a.c.core.AprLifecycleListener.log - An incompatible version [1.2.12] of the Apache Tomcat Native library is installed, while Tomcat requires version [1.2.14]
+2022-26-07 01:58:55.633 [35m[main][0;39m [34mINFO [0;39m o.s.b.w.e.tomcat.TomcatWebServer.initialize - Tomcat initialized with port(s): 8520 (http)
+2022-26-07 01:58:55.645 [35m[main][0;39m [34mINFO [0;39m o.a.coyote.http11.Http11NioProtocol.log - Initializing ProtocolHandler ["http-nio-8520"]
+2022-26-07 01:58:55.647 [35m[main][0;39m [34mINFO [0;39m o.a.catalina.core.StandardService.log - Starting service [Tomcat]
+2022-26-07 01:58:55.648 [35m[main][0;39m [34mINFO [0;39m o.a.catalina.core.StandardEngine.log - Starting Servlet engine: [Apache Tomcat/9.0.41]
+2022-26-07 01:58:55.969 [35m[main][0;39m [34mINFO [0;39m o.a.c.c.C.[Tomcat].[localhost].[/].log - Initializing Spring embedded WebApplicationContext
+2022-26-07 01:58:55.971 [35m[main][0;39m [34mINFO [0;39m o.s.b.w.s.c.ServletWebServerApplicationContext.prepareWebApplicationContext - Root WebApplicationContext: initialization completed in 3126 ms
+2022-26-07 01:58:56.238 [35m[main][0;39m [31mWARN [0;39m o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext.refresh - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'mailController': Unsatisfied dependency expressed through field 'mailService'; nested exception is org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'mailServiceImpl': Unsatisfied dependency expressed through field 'mailSender'; nested exception is org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type 'org.springframework.mail.javamail.JavaMailSender' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {@org.springframework.beans.factory.annotation.Autowired(required=true)}
+2022-26-07 01:58:56.241 [35m[main][0;39m [34mINFO [0;39m o.a.catalina.core.StandardService.log - Stopping service [Tomcat]
+2022-26-07 01:58:56.272 [35m[main][0;39m [34mINFO [0;39m o.s.b.a.l.ConditionEvaluationReportLoggingListener.logMessage - 
+
+Error starting ApplicationContext. To display the conditions report re-run your application with 'debug' enabled.
+2022-26-07 01:58:56.698 [35m[main][0;39m [1;31mERROR[0;39m o.s.b.d.LoggingFailureAnalysisReporter.report - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Field mailSender in com.ctf.service.impl.MailServiceImpl required a bean of type 'org.springframework.mail.javamail.JavaMailSender' that could not be found.
+
+The injection point has the following annotations:
+	- @org.springframework.beans.factory.annotation.Autowired(required=true)
+
+
+Action:
+
+Consider defining a bean of type 'org.springframework.mail.javamail.JavaMailSender' in your configuration.
+

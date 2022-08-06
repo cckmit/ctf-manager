@@ -1,0 +1,19 @@
+2022-26-07 01:58:55.228 [35m[main][0;39m [1;31mERROR[0;39m o.a.c.core.AprLifecycleListener.log - An incompatible version [1.2.12] of the Apache Tomcat Native library is installed, while Tomcat requires version [1.2.14]
+2022-26-07 01:58:56.698 [35m[main][0;39m [1;31mERROR[0;39m o.s.b.d.LoggingFailureAnalysisReporter.report - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Field mailSender in com.ctf.service.impl.MailServiceImpl required a bean of type 'org.springframework.mail.javamail.JavaMailSender' that could not be found.
+
+The injection point has the following annotations:
+	- @org.springframework.beans.factory.annotation.Autowired(required=true)
+
+
+Action:
+
+Consider defining a bean of type 'org.springframework.mail.javamail.JavaMailSender' in your configuration.
+

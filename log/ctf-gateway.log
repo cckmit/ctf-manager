@@ -1,0 +1,9 @@
+date:2022-08-04 11:01:21	thread:main	level:INFO 	logger:com.ctf.gateway.CtfGatewayApplication           	msg:The following profiles are active: native
+date:2022-08-04 11:01:26	thread:main	level:INFO 	logger:com.ctf.gateway.CtfGatewayApplication           	msg:Started CtfGatewayApplication in 7.258 seconds (JVM running for 8.474)
+date:2022-08-04 11:18:47	thread:Thread-2	level:WARN 	logger:c.alibaba.nacos.common.http.HttpClientBeanHolder	msg:[HttpClientBeanHolder] Start destroying common HttpClient
+date:2022-08-04 11:18:47	thread:Thread-21	level:WARN 	logger:com.alibaba.nacos.common.notify.NotifyCenter    	msg:[NotifyCenter] Start destroying Publisher
+date:2022-08-04 11:18:47	thread:Thread-21	level:WARN 	logger:com.alibaba.nacos.common.notify.NotifyCenter    	msg:[NotifyCenter] Destruction of the end
+date:2022-08-04 11:18:47	thread:Thread-2	level:WARN 	logger:c.alibaba.nacos.common.http.HttpClientBeanHolder	msg:[HttpClientBeanHolder] Destruction of the end
+date:2022-08-04 11:18:56	thread:SpringContextShutdownHook	level:WARN 	logger:com.alibaba.nacos.client.naming                 	msg:[NamingHttpClientManager] Start destroying NacosRestTemplate
+date:2022-08-04 11:18:56	thread:SpringContextShutdownHook	level:WARN 	logger:com.alibaba.nacos.client.naming                 	msg:[NamingHttpClientManager] Destruction of the end
+date:2022-08-04 11:18:56	thread:SpringContextShutdownHook	level:WARN 	logger:o.s.beans.factory.support.DisposableBeanAdapter 	msg:Destroy method 'close' on bean with name 'nacosServiceRegistry' threw an exception: java.lang.NullPointerException

@@ -1,0 +1,5 @@
+ctf:
+  nacos:
+    server-addr: 127.0.0.1:8848
+    config:
+      namespace: 37c06f32-08cc-4d74-a8ff-b4e066667fde

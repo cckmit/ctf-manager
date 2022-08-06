@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE logback>
+<configuration>
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern><![CDATA[date:%d{yyyy-MM-dd HH:mm:ss}\tthread:%thread\tlevel:%-5level\tlogger:%-48logger{48}\tmsg:%msg%n]]></pattern>
+		</encoder>
+	</appender>
+
+	<appender name="ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>log/ctf-gateway.log</File>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<FileNamePattern>log/ctf-gateway-%d{yyyyMMdd}.log</FileNamePattern>
+			<MaxHistory>2</MaxHistory>
+		</rollingPolicy>
+		<encoder>
+			<Pattern><![CDATA[date:%d{yyyy-MM-dd HH:mm:ss}\tthread:%thread\tlevel:%-5level\tlogger:%-48logger{48}\tmsg:%msg%n]]></Pattern>
+		</encoder>
+	</appender>
+
+    <!--
+    <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>127.0.0.1:5044</destination>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp/>
+                <version/>
+                <message/>
+                <loggerName/>
+                <threadName/>
+                <logLevel/>
+                <callerData/>
+            </providers>
+        </encoder>
+    </appender>
+    -->
+
+	<!-- Application Loggers -->
+	<logger name="com.ctf.gateway">
+		<level value="debug" />
+	</logger>
+
+	<!-- 3rdparty Loggers -->
+	<logger name="org.apache.http">
+		<level value="error" />
+	</logger>
+
+	<logger name="org.springframework.core">
+		<level value="warn" />
+	</logger>
+
+	<logger name="org.springframework.beans">
+		<level value="warn" />
+	</logger>
+
+	<logger name="org.springframework.context">
+		<level value="warn" />
+	</logger>
+
+	<logger name="org.springframework.web">
+		<level value="warn" />
+	</logger>
+
+	<logger name="org.springframework.web.servlet">
+		<level value="info" />
+	</logger>
+
+    <logger name="org.springframework.web.servlet.DispatcherServlet">
+        <level value="debug" />
+    </logger>
+
+	<logger name="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+		<level value="info" />
+	</logger>
+
+	<logger name="org.springframework.security.core.userdetails">
+		<level value="debug" />
+	</logger>
+
+	<logger name="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<level value="debug" />
+	</logger>
+
+	<logger name="jdbc.sqltiming">
+		<level value="debug" />
+	</logger>
+
+    <logger name="com.alibaba.cloud.nacos.client">
+        <level value="error" />
+    </logger>
+
+	<root>
+		<level value="warn" />
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="ROLLING" />
+        <!-- <appender-ref ref="LOGSTASH" /> -->
+	</root>
+</configuration>

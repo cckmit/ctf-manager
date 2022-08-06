@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ctf.auth.mapper.AuthMapper">
+
+    <select id="getSysUser" resultType="java.util.LinkedHashMap">
+        SELECT CAST(msu.id AS CHAR) AS "id",msu.username AS "username",msu.nickname AS "nickname",msu.phone AS "phone",msu.mobile AS "mobile",msu.email AS "email",msu.province_regioncode AS "provinceRegionCode",msrp.region_name AS "provinceRegionName",msu.city_regioncode AS "cityRegionCode",msrc.region_name AS "cityRegionName",msu.address AS "address",msu.profile AS "profile",msu.notify_message AS "notifyMessage",msu.notify_todo AS "notifyTodo",msu.avatar AS "avatar",GROUP_CONCAT(msr.role_code) AS "roles"
+        FROM mscode_sys_user msu LEFT JOIN mscode_sys_region msrp ON msu.province_regioncode = msrp.region_code LEFT JOIN mscode_sys_region msrc ON msu.city_regioncode = msrc.region_code LEFT JOIN mscode_sys_role_user msru ON msu.id = msru.user_id LEFT JOIN mscode_sys_role msr ON msr.id = msru.role_id
+        WHERE username = #{username,jdbcType=VARCHAR}
+    </select>
+
+    <select id="getSysUserByUsername" resultType="java.util.LinkedHashMap">
+        SELECT USERNAME AS "USERNAME",PASSWORD AS "PASSWORD"
+        FROM mscode_sys_user
+        WHERE username = #{username,jdbcType=VARCHAR}
+    </select>
+
+    <select id="getSysUserByMobile" resultType="java.util.LinkedHashMap">
+        SELECT USERNAME AS "USERNAME",PASSWORD AS "PASSWORD"
+        FROM mscode_sys_user
+        WHERE mobile = #{mobile,jdbcType=VARCHAR}
+    </select>
+
+    <select id="queryRoleCodeByUsername" resultType="String">
+        SELECT role_code AS "roleCode"
+        FROM mscode_sys_user msu LEFT JOIN mscode_sys_role_user msru ON msu.id = msru.user_id INNER JOIN mscode_sys_role msr ON msru.role_id = msr.id AND msu.username = #{username,jdbcType=VARCHAR}
+    </select>
+
+    <select id="queryRoleCodeByMobile" resultType="String">
+        SELECT role_code AS "roleCode"
+        FROM mscode_sys_user msu LEFT JOIN mscode_sys_role_user msru ON msu.id = msru.user_id INNER JOIN mscode_sys_role msr ON msru.role_id = msr.id AND msu.mobile = #{mobile,jdbcType=VARCHAR}
+    </select>
+
+</mapper>

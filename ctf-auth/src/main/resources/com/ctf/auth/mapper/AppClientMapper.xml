@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ctf.auth.mapper.AppClientMapper">
+
+    <select id="queryAppClient" parameterType="map" resultType="java.util.LinkedHashMap">
+        SELECT CAST(id AS CHAR) AS "id",client_code AS "clientCode",client_secret AS "clientSecret",auth_type AS "authType",auth_scope AS "authScope",token_seconds AS "tokenSeconds",refresh_seconds AS "refreshSeconds",fallback_url AS "fallbackUrl",client_description AS "clientDescription",create_time AS "createTime"
+        FROM mscode_app_client
+  	    WHERE 1 = 1
+      	<if test="clientCode != null and clientCode != ''">
+    		AND client_code LIKE CONCAT('%',#{clientCode},'%')
+    	</if>
+        <if test="authType != null and authType != ''">
+            AND auth_type LIKE CONCAT('%',#{authType},'%')
+        </if>
+        <if test="tenantCode != null and tenantCode != ''">
+            AND tenant_code = #{tenantCode}
+        </if>
+        <if test="sort != null and sequence != null">
+            ORDER BY ${sort} ${sequence}
+        </if>
+    </select>
+
+    <select id="getAppClientByClientCode" resultType="Integer">
+        SELECT DISTINCT 1
+        FROM mscode_app_client
+        WHERE client_code = #{clientCode,jdbcType=VARCHAR}
+        <if test="id != null">
+            AND id != #{id}
+        </if>
+    </select>
+
+    <insert id="insertAppClient" parameterType="AppClient">
+        INSERT INTO mscode_app_client
+            (id, client_code, client_secret, auth_type, auth_scope, token_seconds, refresh_seconds, fallback_url, client_description, tenant_code)
+        VALUES
+            (#{id,jdbcType=BIGINT}, #{clientCode,jdbcType=VARCHAR}, #{clientSecret,jdbcType=VARCHAR}, #{authType,jdbcType=VARCHAR}, #{authScope,jdbcType=VARCHAR}, #{tokenSeconds,jdbcType=BIGINT}, #{refreshSeconds,jdbcType=BIGINT}, #{fallbackUrl,jdbcType=VARCHAR}, #{clientDescription,jdbcType=VARCHAR}, #{tenantCode,jdbcType=VARCHAR})
+    </insert>
+
+    <update id="updateAppClient" parameterType="AppClient">
+        UPDATE mscode_app_client
+        <set>
+            <if test="clientSecret != null and clientSecret != ''">client_secret=#{clientSecret},</if>
+            <if test="authType != null and authType != ''">auth_type=#{authType},</if>
+            <if test="authScope != null and authScope != ''">auth_scope=#{authScope},</if>
+            <if test="tokenSeconds != null">token_seconds=#{tokenSeconds},</if>
+            <if test="refreshSeconds != null">refresh_seconds=#{refreshSeconds},</if>
+            <if test="fallbackUrl != null and fallbackUrl != ''">fallback_url=#{fallbackUrl},</if>
+            client_description=#{clientDescription,jdbcType=VARCHAR},
+        </set>
+        WHERE id=#{id,jdbcType=BIGINT}
+    </update>
+
+    <delete id="deleteAppClient">
+		DELETE FROM mscode_app_client WHERE id IN
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id,jdbcType=BIGINT}
+		</foreach>
+	</delete>
+
+</mapper>

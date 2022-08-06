@@ -1,0 +1,54 @@
+package ${packageName}.service;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import ${packageName}.entity.${entityName};
+
+/**
+ * 业务逻辑接口层
+ */
+public interface ${entityName}Service {
+
+	/**
+	 * 查询分页
+	 * 
+	 * @param currentPage   当前页数
+	 * @param pageSize      每页记录数
+	 * @param name          名称
+	 * @param sorter        排序
+	 * @return
+	 */
+	Map<String, Object> query${entityName}(Integer currentPage, Integer pageSize, String name, String sorter);
+
+	/**
+	 * 查询导出数据列表
+	 * 
+	 * @param paramMap 参数Map
+	 * @return
+	 */
+	List<LinkedHashMap<String, Object>> query${entityName}ForExcel(Map<String, Object> paramMap);
+
+	/**
+	 * 新增
+	 * 
+	 * @param ${lowercaseFirstOneEntityName}
+	 */
+	void insert${entityName}(${entityName} ${lowercaseFirstOneEntityName});
+
+	/**
+	 * 编辑
+	 * 
+	 * @param ${lowercaseFirstOneEntityName}
+	 */
+	void update${entityName}(${entityName} ${lowercaseFirstOneEntityName});
+
+	/**
+	 * 删除
+	 * 
+	 * @param id ID
+	 */
+	void delete${entityName}(Long[] id);
+
+}
